@@ -7,29 +7,29 @@ MySample.main = (function() {
     let gl = canvas.getContext('webgl2');
 
     //step 3
-    let vertices = new Float32Array([
-        -0.5, 0.0, 0.5, 1.0,
-        0.0, 0.0, 0.0, 1.0,
-        0.0, 0.5, 0.5, 1.0,
+    let tetrahedronVertices = new Float32Array([
+        -0.9, 0.0, 0.25, 1.0,
+        -0.75, 0.0, 0.0, 1.0,
+        -0.75, 0.25, 0.25, 1.0,
 
-        0.0, 0.0, 0.0, 1.0,
-        0.5, 0.0, 0.5, 1.0,
-        0.0, 0.5, 0.5, 1.0,
+        -0.75, 0.0, 0.0, 1.0,
+        -0.6, 0.0, 0.25, 1.0,
+        -0.75, 0.25, 0.25, 1.0,
 
-        0.5, 0.0, 0.5, 1.0,
-        -0.5, 0.0, 0.5, 1.0,
-        0.0, 0.5, 0.5, 1.0,
+        -0.6, 0.0, 0.25, 1.0,
+        -0.9, 0.0, 0.25, 1.0,
+        -0.75, 0.25, 0.25, 1.0,
 
-        0.0, 0.0, 0.0, 1.0,
-        -0.5, 0.0, 0.5, 1.0,
-        0.5, 0.0, 0.5, 1.0,
+        -0.75, 0.0, 0.0, 1.0,
+        -0.9, 0.0, 0.25, 1.0,
+        -0.6, 0.0, 0.25, 1.0,
        
     ]);
-    let indices = new Uint16Array([
+    let tetrahedronIndices = new Uint16Array([
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
        
     ]);
-    let vertexColors = new Float32Array([
+    let tetrahedronVertexColors = new Float32Array([
         1.0, 0.0, 0.0,
         0.0, 0.0, 4.0,
         0.0, 2.0, 0.0,
@@ -39,42 +39,53 @@ MySample.main = (function() {
         
     ]);
     let cubeVertices = new Float32Array([
-        0.5, 0.5, 0.0, 1.0,
-        -0.5, 0.5, 0.0, 1.0,
-        -0.5, -0.5, 0.0, 1.0,
-        -0.5, -0.5, 0.0, 1.0,
-        0.5, -0.5, 0.0, 1.0,
-        0.5, 0.5, 0.0, 1.0, //End of Front face
-        0.5, 0.5, 1.0, 1.0,
-        -0.5, 0.5, 1.0, 1.0,
-        -0.5, -0.5, 1.0, 1.0,
-        -0.5, -0.5, 1.0, 1.0,
-        0.5, -0.5, 1.0, 1.0,
-        0.5, 0.5, 1.0, 1.0, // End of Back face
-        0.5, 0.5, 1.0, 1.0,
-        0.5, 0.5, 0.0, 1.0,
-        0.5, -0.5, 0.0, 1.0,
-        0.5, -0.5, 0.0, 1.0,
-        0.5, -0.5, 1.0, 1.0,
-        0.5, 0.5, 1.0, 1.0, // End of right face
-        -0.5, 0.5, 1.0, 1.0,
-        -0.5, 0.5, 0.0, 1.0,
-        -0.5, -0.5, 0.0, 1.0,
-        -0.5, -0.5, 0.0, 1.0,
-        -0.5, -0.5, 1.0, 1.0,
-        -0.5, 0.5, 1.0, 1.0, // End of Left face
-        -0.5, 0.5, 0.0, 1.0,
-        -0.5, 0.5, 1.0, 1.0,
-        0.5, 0.5, 1.0, 1.0,
-        -0.5, 0.5, 0.0, 1.0,
-        0.5, 0.5, 0.0, 1.0,
-        0.5, 0.5, 1.0, 1.0, // End of top face
-        -0.5, -0.5, 0.0, 1.0,
-        -0.5, -0.5, 1.0, 1.0,
-        0.5, -0.5, 1.0, 1.0,
-        -0.5, -0.5, 0.0, 1.0,
-        0.5, -0.5, 0.0, 1.0,
-        0.5, -0.5, 1.0, 1.0,
+        0.9, 0.3, 0.0, 1.0,
+        0.6, 0.3, 0.0, 1.0,
+        0.6, 0.0, 0.0, 1.0,
+
+        0.6, 0.0, 0.0, 1.0,
+        0.9, 0.0, 0.0, 1.0,
+        0.9, 0.3, 0.0, 1.0,
+
+        0.9, 0.3, 0.3, 1.0,
+        0.6, 0.3, 0.3, 1.0,
+        0.6, 0.0, 0.3, 1.0,
+
+        0.6, 0.0, 0.3, 1.0,
+        0.9, 0.0, 0.3, 1.0,
+        0.9, 0.3, 0.3, 1.0,
+
+        0.9, 0.3, 0.3, 1.0,
+        0.9, 0.3, 0.0, 1.0,
+        0.9, 0.0, 0.0, 1.0,
+
+        0.9, 0.0, 0.0, 1.0,
+        0.9, 0.0, 0.3, 1.0,
+        0.9, 0.3, 0.3, 1.0, 
+
+        0.6, 0.3, 0.3, 1.0,
+        0.6, 0.3, 0.0, 1.0,
+        0.6, 0.0, 0.0, 1.0,
+
+        0.6, 0.0, 0.0, 1.0,
+        0.6, 0.0, 0.3, 1.0,
+        0.6, 0.3, 0.3, 1.0, 
+
+        0.6, 0.3, 0.0, 1.0,
+        0.6, 0.3, 0.3, 1.0,
+        0.9, 0.3, 0.3, 1.0,
+
+        0.6, 0.3, 0.0, 1.0,
+        0.9, 0.3, 0.0, 1.0,
+        0.9, 0.3, 0.3, 1.0, 
+
+        0.6, 0.0, 0.0, 1.0,
+        0.6, 0.0, 0.3, 1.0,
+        0.9, 0.0, 0.3, 1.0,
+
+        0.6, 0.0, 0.0, 1.0,
+        0.9, 0.0, 0.0, 1.0,
+        0.9, 0.0, 0.3, 1.0,
     ])
     let cubeIndices = new Uint16Array([
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35
@@ -85,40 +96,58 @@ MySample.main = (function() {
         0.0, 2.0, 0.0,
         1.0, 1.0, 0.0,
         1.0, 0.0, 1.0,
-        0.0, 0.5, 0.5
+        0.0, 0.5, 0.5,
+        1.0, 0.0, 0.0,
+        0.0, 0.0, 4.0,
+        0.0, 2.0, 0.0,
+        1.0, 1.0, 0.0,
+        1.0, 0.0, 1.0,
+        0.0, 0.5, 0.5,
+        1.0, 0.0, 0.0,
+        0.0, 0.0, 4.0,
+        0.0, 2.0, 0.0,
+        1.0, 1.0, 0.0,
+        1.0, 0.0, 1.0,
+        0.0, 0.5, 0.5,
+        1.0, 0.0, 0.0,
+        0.0, 0.0, 4.0,
+        0.0, 2.0, 0.0,
+        1.0, 1.0, 0.0,
+        1.0, 0.0, 1.0,
+        0.0, 0.5, 0.5,
     ]);
     let octahedronVertices = new Float32Array([
         0.0, 0.0, 0.0, 1.0,
-        0.5, 0.0, 0.5, 1.0,
-        0.0, 0.5, 0.5, 1.0,
+        0.25, 0.0, 0.25, 1.0,
+        0.0, 0.25, 0.25, 1.0,
 
         0.0, 0.0, 0.0, 1.0,
-        0.0, 0.5, 0.5, 1.0,
-        -0.5, 0.0, 0.5, 1.0,
+        0.0, 0.25, 0.25, 1.0,
+        -0.25, 0.0, 0.25, 1.0,
 
-        0.5, 0.0, 0.5, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-        0.0, 0.5, 0.5, 1.0,
+        0.25, 0.0, 0.25, 1.0,
+        0.0, 0.0, 0.5, 1.0,
+        0.0, 0.25, 0.25, 1.0,
 
-        0.0, 0.0, 1.0, 1.0,
-        -0.5, 0.0, 0.5, 1.0,
-        0.0, 0.5, 0.5, 1.0,
-
-        0.0, 0.0, 0.0, 1.0,
-        0.0, -0.5, 0.5, 1.0,
-        0.5, 0.0, 0.5, 1.0,
+        0.0, 0.0, 0.5, 1.0,
+        -0.25, 0.0, 0.25, 1.0,
+        0.0, 0.25, 0.25, 1.0,
 
         0.0, 0.0, 0.0, 1.0,
-        -0.5, 0.0, 0.5, 1.0,
-        0.0, -0.5, 0.5, 1.0,
+        0.0, -0.25, 0.25, 1.0,
+        0.25, 0.0, 0.25, 1.0,
+
+        0.0, 0.0, 0.0, 1.0,
+        -0.25, 0.0, 0.25, 1.0,
+        0.0, -0.25, 0.25, 1.0,
         
-        0.0, 0.0, 1.0, 1.0,
-        -0.5, 0.0, 0.5, 1.0,
-        0.0, -0.5, 0.5, 1.0,
+        0.0, 0.0, 0.5, 1.0,
+        -0.25, 0.0, 0.25, 1.0,
+        0.0, -0.25, 0.25, 1.0,
 
-        0.0, 0.0, 1.0, 1.0,
-        0.5, 0.0, 0.5, 1.0,
-        0.0, -0.5, 0.5, 1.0
+        0.0, 0.0, 0.5, 1.0,
+        0.25, 0.0, 0.25, 1.0,
+        0.0, -0.25, 0.25, 1.0
     ]);
     let octahedronIndices = new Uint16Array([
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
@@ -143,23 +172,25 @@ MySample.main = (function() {
         1.0, 0.0, 1.0,
         0.0, 0.5, 0.5
     ]);
-
+    let vertices = new Float32Array([...octahedronVertices, ...tetrahedronVertices, ...cubeVertices]);
+    let indices = new Uint16Array([...octahedronIndices, ...tetrahedronIndices, ...cubeIndices]);
+    let vertexColors = new Float32Array([...octahedronColors, ...tetrahedronVertexColors, ...cubeColors]);
+    
     //step 4
     let vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, octahedronVertices, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     let vertexColorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, octahedronColors, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, vertexColors, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     let indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, octahedronIndices, gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-    
 
     //step 5
     let right = 1;
@@ -201,7 +232,7 @@ MySample.main = (function() {
     let vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, vertexShaderSource);
     gl.compileShader(vertexShader);
-    console.log(gl.getShaderInfoLog(vertexShader)); // for debugging
+    // console.log(gl.getShaderInfoLog(vertexShader)); // for debugging
     
     let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, fragmentShaderSource);
@@ -219,11 +250,13 @@ MySample.main = (function() {
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     let position = gl.getAttribLocation(shaderProgram, 'aPosition');
     gl.enableVertexAttribArray(position);
-    gl.vertexAttribPointer(position, 4, gl.FLOAT, false, octahedronVertices.BYTES_PER_ELEMENT * 4, 0);
+    gl.vertexAttribPointer(position, 4, gl.FLOAT, false, vertices.BYTES_PER_ELEMENT * 4, 0);
+
+    
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
     let color = gl.getAttribLocation(shaderProgram, 'aColor');
     gl.enableVertexAttribArray(color);
-    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, octahedronColors.BYTES_PER_ELEMENT * 3, 0);
+    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, vertexColors.BYTES_PER_ELEMENT * 3, 0);
     
     //step 8
     gl.clearColor(
@@ -240,7 +273,7 @@ MySample.main = (function() {
         
         //step 9
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.drawElements(gl.TRIANGLES, octahedronIndices.length, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
         
         let angle = 0;
         const rotationSpeed = .01;
