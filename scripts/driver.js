@@ -1,33 +1,68 @@
-
 MySample.main = (function() {
     'use strict';
-
     // step 2   
     let canvas = document.getElementById('canvas-main');
     let gl = canvas.getContext('webgl2');
-
-    //step 3
-    let tetrahedronVertices = new Float32Array([
-        -0.9, 0.0, 0.25, 1.0,
-        -0.75, 0.0, 0.0, 1.0,
-        -0.75, 0.25, 0.25, 1.0,
-
-        -0.75, 0.0, 0.0, 1.0,
-        -0.6, 0.0, 0.25, 1.0,
-        -0.75, 0.25, 0.25, 1.0,
-
-        -0.6, 0.0, 0.25, 1.0,
-        -0.9, 0.0, 0.25, 1.0,
-        -0.75, 0.25, 0.25, 1.0,
-
-        -0.75, 0.0, 0.0, 1.0,
-        -0.9, 0.0, 0.25, 1.0,
-        -0.6, 0.0, 0.25, 1.0,
-       
+    let previousTime = performance.now();
+    let objects = { 
+        vertices: new Float32Array([]),
+        colors: new Float32Array([]),
+        indices: new Uint16Array([]),
+    }
+    let projection = {
+        parallelProjection: new Float32Array([]),
+        perspectiveProjection: new Float32Array([]),
+    };
+    let view = new Float32Array([
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ]);
+    let right = 1;
+    let left = -1;
+    let top = 1;
+    let bottom = -1;
+    let near = 1;
+    let far = 10;
+    let translate1 = new Float32Array ([
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, -2,
+        0, 0, 0, 1
+    ]);
+    let translate2 = new Float32Array([
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 2,
+        0, 0, 0, 1
+    ]);
+    projection.parallelProjection = new Float32Array([
+        2 / (right - left), 0, 0, -((left + right) / (right - left)),
+        0, 2 / (top - bottom), 0, -((top + bottom) / (top - bottom)),
+        0, 0, -2 / (far - near),-((far + near) / (far - near)),
+        0, 0, 0, 1
+    ]);
+    projection.perspectiveProjection = new Float32Array([
+        near / right, 0, 0, 0,
+        0, near / top, 0, 0,
+        0, 0, -(far + near) / (far - near), (-2 * far * near) / (far - near),
+        0, 0, -1, 0
+    ]);
+    let model = new Float32Array([
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
     ]);
     let tetrahedronIndices = new Uint16Array([
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
-       
+        0, 1, 2, 1, 3, 2, 3, 0, 2, 1, 0, 3
+    ]);
+    let tetrahedronVertices = new Float32Array([
+        -0.5, 0.0, -3.0, //0
+        0.0, 0.0, -2.0, //1 
+        0.0, 1.0, -3.0, //2
+        0.5, 0.0, -3.0, //3
     ]);
     let tetrahedronVertexColors = new Float32Array([
         1.0, 0.0, 0.0,
@@ -39,56 +74,17 @@ MySample.main = (function() {
         
     ]);
     let cubeVertices = new Float32Array([
-        0.9, 0.3, 0.0, 1.0,
-        0.6, 0.3, 0.0, 1.0,
-        0.6, 0.0, 0.0, 1.0,
-
-        0.6, 0.0, 0.0, 1.0,
-        0.9, 0.0, 0.0, 1.0,
-        0.9, 0.3, 0.0, 1.0,
-
-        0.9, 0.3, 0.3, 1.0,
-        0.6, 0.3, 0.3, 1.0,
-        0.6, 0.0, 0.3, 1.0,
-
-        0.6, 0.0, 0.3, 1.0,
-        0.9, 0.0, 0.3, 1.0,
-        0.9, 0.3, 0.3, 1.0,
-
-        0.9, 0.3, 0.3, 1.0,
-        0.9, 0.3, 0.0, 1.0,
-        0.9, 0.0, 0.0, 1.0,
-
-        0.9, 0.0, 0.0, 1.0,
-        0.9, 0.0, 0.3, 1.0,
-        0.9, 0.3, 0.3, 1.0, 
-
-        0.6, 0.3, 0.3, 1.0,
-        0.6, 0.3, 0.0, 1.0,
-        0.6, 0.0, 0.0, 1.0,
-
-        0.6, 0.0, 0.0, 1.0,
-        0.6, 0.0, 0.3, 1.0,
-        0.6, 0.3, 0.3, 1.0, 
-
-        0.6, 0.3, 0.0, 1.0,
-        0.6, 0.3, 0.3, 1.0,
-        0.9, 0.3, 0.3, 1.0,
-
-        0.6, 0.3, 0.0, 1.0,
-        0.9, 0.3, 0.0, 1.0,
-        0.9, 0.3, 0.3, 1.0, 
-
-        0.6, 0.0, 0.0, 1.0,
-        0.6, 0.0, 0.3, 1.0,
-        0.9, 0.0, 0.3, 1.0,
-
-        0.6, 0.0, 0.0, 1.0,
-        0.9, 0.0, 0.0, 1.0,
-        0.9, 0.0, 0.3, 1.0,
+        0.5, 0.5, -1.0, //0
+        -0.5, 0.5, -1.0, //1
+        -0.5, -0.5, -1.0, //2
+        0.5, -0.5, -1.0, //3
+        0.5, 0.5, -2.0, //4 
+        -0.5, 0.5, -2.0, //5
+        -0.5, -0.5, -2.0, //6
+        0.5, -0.5, -2.0, //7
     ])
     let cubeIndices = new Uint16Array([
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35
+        0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 4, 0, 3, 3, 7, 4, 5, 1, 2, 2, 6, 5, 1, 5, 4, 1, 0, 4, 2, 6, 7, 2, 3, 7
     ]);
     let cubeColors = new Float32Array([
         1.0, 0.0, 0.0,
@@ -115,42 +111,29 @@ MySample.main = (function() {
         1.0, 1.0, 0.0,
         1.0, 0.0, 1.0,
         0.0, 0.5, 0.5,
+        1.0, 0.0, 0.0,
+        0.0, 0.0, 4.0,
+        0.0, 2.0, 0.0,
+        1.0, 1.0, 0.0,
+        1.0, 0.0, 1.0,
+        0.0, 0.5, 0.5,
+        1.0, 0.0, 0.0,
+        0.0, 0.0, 4.0,
+        0.0, 2.0, 0.0,
+        1.0, 1.0, 0.0,
+        1.0, 0.0, 1.0,
+        0.0, 0.5, 0.5,
     ]);
     let octahedronVertices = new Float32Array([
-        0.0, 0.0, 0.0, 1.0,
-        0.25, 0.0, 0.25, 1.0,
-        0.0, 0.25, 0.25, 1.0,
-
-        0.0, 0.0, 0.0, 1.0,
-        0.0, 0.25, 0.25, 1.0,
-        -0.25, 0.0, 0.25, 1.0,
-
-        0.25, 0.0, 0.25, 1.0,
-        0.0, 0.0, 0.5, 1.0,
-        0.0, 0.25, 0.25, 1.0,
-
-        0.0, 0.0, 0.5, 1.0,
-        -0.25, 0.0, 0.25, 1.0,
-        0.0, 0.25, 0.25, 1.0,
-
-        0.0, 0.0, 0.0, 1.0,
-        0.0, -0.25, 0.25, 1.0,
-        0.25, 0.0, 0.25, 1.0,
-
-        0.0, 0.0, 0.0, 1.0,
-        -0.25, 0.0, 0.25, 1.0,
-        0.0, -0.25, 0.25, 1.0,
-        
-        0.0, 0.0, 0.5, 1.0,
-        -0.25, 0.0, 0.25, 1.0,
-        0.0, -0.25, 0.25, 1.0,
-
-        0.0, 0.0, 0.5, 1.0,
-        0.25, 0.0, 0.25, 1.0,
-        0.0, -0.25, 0.25, 1.0
+        0.0, 0.0, -1.0, //0
+        0.25, 0.0, -1.5, //1
+        0.0, 0.25, -1.5, //2 
+        -0.25, 0.0, -1.5, //3
+        0.0, 0.0, -2.0, //4
+        0.0, -0.25, -1.5, //5
     ]);
     let octahedronIndices = new Uint16Array([
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+        0, 1, 2, 0, 2, 3, 1, 4, 2, 4, 3, 2, 0, 5, 1, 0, 3, 5, 4, 3, 5, 4, 1, 5
     ]);
     let octahedronColors = new Float32Array([
         1.0, 0.0, 0.0,
@@ -170,149 +153,167 @@ MySample.main = (function() {
         0.0, 2.0, 0.0,
         1.0, 1.0, 0.0,
         1.0, 0.0, 1.0,
-        0.0, 0.5, 0.5
+        0.0, 0.5, 0.5,
+        1.0, 0.0, 0.0,
+        0.0, 0.0, 4.0,
+        0.0, 2.0, 0.0,
+        1.0, 1.0, 0.0,
+        1.0, 0.0, 1.0,
+        0.0, 0.5, 0.5,
     ]);
-    let vertices = new Float32Array([...octahedronVertices, ...tetrahedronVertices, ...cubeVertices]);
-    let indices = new Uint16Array([...octahedronIndices, ...tetrahedronIndices, ...cubeIndices]);
-    let vertexColors = new Float32Array([...octahedronColors, ...tetrahedronVertexColors, ...cubeColors]);
-    
-    //step 4
     let vertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
     let vertexColorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertexColors, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
     let indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-
-    //step 5
-    let right = 1;
-    let left = -1;
-    let top = 1;
-    let bottom = -1;
-    let near = 1;
-    let far = -1;
-    let object = {
-        center: {
-            x: 0,
-            y: 0, 
-            z: 0
+    let theta = 0;
+    let proj = projection.perspectiveProjection;
+    function update(elapsedTime) {
+        let yzRotation = new Float32Array([
+            1, 0, 0, 0,
+            0, Math.cos(theta), -Math.sin(theta), 0,
+            0, Math.sin(theta), Math.cos(theta), -1,
+            0, 0, 0, 1
+        ]);
+        let xzRotation = new Float32Array([
+            Math.cos(theta), 0, Math.sin(theta), 0,
+            0, 1, 0, 0,
+            -Math.sin(theta), 0, Math.cos(theta), 0,
+            0, 0, 0, 1
+        ]);
+        let xyRotation = new Float32Array([
+            Math.cos(theta), -Math.sin(theta), 0, 0,
+            Math.sin(theta), Math.cos(theta), 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        ]);
+        let rot = xzRotation;
+        if(theta <= 5){
+            objects.vertices = octahedronVertices;
+            objects.indices = octahedronIndices
+            objects.colors = octahedronColors;
+            proj = projection.perspectiveProjection;
+            rot = xzRotation
+        }else if(theta > 5 && theta <= 10) {
+            objects.vertices = octahedronVertices;
+            objects.indices = octahedronIndices
+            objects.colors = octahedronColors;
+            proj = projection.parallelProjection;
+            rot = xzRotation
         }
-    }
-    let matTranslate = [
-        1, 0, 0, object.center.x,
-        0, 1, 0, object.center.y,
-        0, 0, 1, object.center.z,
-        0, 0, 0, 1
-    ];
-    let vertexShaderSource = `#version 300 es
-    in vec4 aPosition;
-    in vec4 aColor;
-    out vec4 vColor;
-    void main()
-    {
-    gl_Position = aPosition;
-    vColor = aColor;
-    }`;
-    let fragmentShaderSource = `#version 300 es
-    precision lowp float;
-    in vec4 vColor;
-    out vec4 outColor;
-    void main()
-    {
-    outColor = vColor;
-    }`;
-    let vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, vertexShaderSource);
-    gl.compileShader(vertexShader);
-    // console.log(gl.getShaderInfoLog(vertexShader)); // for debugging
-    
-    let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fragmentShaderSource);
-    gl.compileShader(fragmentShader);
-    
-    let shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-    gl.useProgram(shaderProgram);
-    let location = gl.getUniformLocation(shaderProgram, 'uThing');
-    gl.uniformMatrix4fv(location, false, transposeMatrix4x4(matTranslate));
-    
-    //step 6
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    let position = gl.getAttribLocation(shaderProgram, 'aPosition');
-    gl.enableVertexAttribArray(position);
-    gl.vertexAttribPointer(position, 4, gl.FLOAT, false, vertices.BYTES_PER_ELEMENT * 4, 0);
+        else if(theta > 10 && theta <= 15){
+            objects.vertices = tetrahedronVertices;
+            objects.indices = tetrahedronIndices;
+            objects.colors = tetrahedronVertexColors;
+            proj = projection.perspectiveProjection;
+            rot = xzRotation
+        }
+        else if (theta > 15 && theta <= 20){
+            objects.vertices = tetrahedronVertices;
+            objects.indices = tetrahedronIndices;
+            objects.colors = tetrahedronVertexColors;
+            proj = projection.parallelProjection;
+            rot = xzRotation
+        }
+        else if (theta > 20 && theta <= 25){
+            objects.vertices = cubeVertices;
+            objects.indices = cubeIndices;
+            objects.colors = cubeColors;
+            proj = projection.perspectiveProjection;
+            rot = xzRotation;
+        }
+        else if (theta > 25 && theta <= 30){
+            objects.vertices = cubeVertices;
+            objects.indices = cubeIndices;
+            objects.colors = cubeColors;
+            proj = projection.parallelProjection;
+            rot = xzRotation;
+        }
+        else{
+            theta = 0;
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, objects.vertices, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
-    let color = gl.getAttribLocation(shaderProgram, 'aColor');
-    gl.enableVertexAttribArray(color);
-    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, vertexColors.BYTES_PER_ELEMENT * 3, 0);
-    
-    //step 8
-    gl.clearColor(
-        0.3921568627450980392156862745098,
-        0.58431372549019607843137254901961,
-        0.92941176470588235294117647058824,
-        1.0
-        );
-        gl.clearDepth(1.0);
-        gl.depthFunc(gl.LEQUAL);
-        gl.enable(gl.DEPTH_TEST);
-        
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        
-        //step 9
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, objects.colors, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, objects.indices, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+        let vertexShaderSource = `#version 300 es
+        in vec4 aPosition;
+        in vec4 aColor;
+        uniform mat4 mProjection;
+        uniform mat4 mView;
+        uniform mat4 mModel;
+        out vec4 vColor;
+        void main()
+        {
+        gl_Position = mProjection * mView * mModel * aPosition;
+        vColor = aColor;
+        }`;
+        let fragmentShaderSource = `#version 300 es
+        precision lowp float;
+        in vec4 vColor;
+        out vec4 outColor;
+        void main()
+        {
+        outColor = vColor;
+        }`;
         
-        let angle = 0;
-        const rotationSpeed = .01;
-
-        
-        let T = [
-            1, 0, 0, -((left + right) / (right - left)),
-            0, 1, 0, -((top + bottom) / (top - bottom)),
-            0, 0, 1, -((far + near) / (far - near)),
-            0, 0, 0, 1
-        ];
-        let S = [
-            2 / (right - left), 0, 0, 0,
-            0, 2 / (top - bottom), 0, 0,
-            0, 0, -(2 / (far - near)), 0,
-            0, 0, 0, 1
-        ];
-        let projection = S * T;
-        let mView = []
-
-    //WebGL Uniform Parameters
-
-    //------------------------------------------------------------------
-    //
-    // Scene updates go here.
-    //
-    //------------------------------------------------------------------
-    
-    function update() {
-        angle += rotationSpeed;
+        let vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vertexShaderSource);
+        gl.compileShader(vertexShader);
+        let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fragmentShaderSource);
+        gl.compileShader(fragmentShader);
+        let shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+        gl.useProgram(shaderProgram);
+        let mProjection = gl.getUniformLocation(shaderProgram, "mProjection");
+        gl.uniformMatrix4fv(mProjection, false, transposeMatrix4x4(proj));
+        let mView = gl.getUniformLocation(shaderProgram, "mView");
+        gl.uniformMatrix4fv(mView, false, transposeMatrix4x4(view));
+        let mModel = gl.getUniformLocation(shaderProgram, "mModel");
+        let translation = multiplyMatrix4x4(translate1, rot);
+        model = multiplyMatrix4x4(translation, translate2);
+        gl.uniformMatrix4fv(mModel, false, transposeMatrix4x4(model));
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        theta += elapsedTime / 1000;
+        let position = gl.getAttribLocation(shaderProgram, 'aPosition');
+        gl.enableVertexAttribArray(position);
+        gl.vertexAttribPointer(position, 3, gl.FLOAT, false, objects.vertices.BYTES_PER_ELEMENT * 3, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
+        let color = gl.getAttribLocation(shaderProgram, 'aColor');
+        gl.enableVertexAttribArray(color);
+        gl.vertexAttribPointer(color, 3, gl.FLOAT, false, objects.colors.BYTES_PER_ELEMENT * 3, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     }
-
+    
     //------------------------------------------------------------------
     //
     // Rendering code goes here
     //
     //------------------------------------------------------------------
     function render() {
+    //step 8
+        gl.clearColor(
+            0.3921568627450980392156862745098,
+            0.58431372549019607843137254901961,
+            0.92941176470588235294117647058824,
+            1.0
+        );
+        gl.clearDepth(1.0);
+        gl.depthFunc(gl.LEQUAL);
+        gl.enable(gl.DEPTH_TEST);
         
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.drawElements(gl.TRIANGLES, objects.indices.length, gl.UNSIGNED_SHORT, 0);
     }
 
     //------------------------------------------------------------------
@@ -321,14 +322,12 @@ MySample.main = (function() {
     //
     //------------------------------------------------------------------
     function animationLoop(time) {
-
-        update();
+        let elapsedTime = time - previousTime;
+        previousTime = time
+        update(elapsedTime);
         render();
-
         requestAnimationFrame(animationLoop);
     }
-
     console.log('initializing...');
     requestAnimationFrame(animationLoop);
-
 }());
